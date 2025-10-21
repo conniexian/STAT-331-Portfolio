@@ -22,21 +22,25 @@ execute:
 
 ```{r}
 #| label: wd-1-csv-1
-
+# Lab 2 Question 1
+surveys <- read_csv(here::here("Week 2", "surveys.csv"))
 ```
 
 -   `csv` Example 2
 
 ```{r}
 #| label: wd-1-csv-2
-
+# Lab 3 Question 2
+teacher_evals <- read_csv(here::here("Week 3", "teacher_evals.csv"))
 ```
 
 -   `xlsx`
 
 ```{r}
 #| label: wd-1-xlsx
-
+# Check-In 2.2
+agesxl <- read_xlsx(path = here::here("Week 2", "Check-ins", "Ages_Data", "ages.xlsx"),
+                    sheet = "ages")
 ```
 
 **WD-2: I can select necessary columns from a dataset.**
