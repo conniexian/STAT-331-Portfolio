@@ -49,21 +49,31 @@ agesxl <- read_xlsx(path = here::here("Week 2", "Check-ins", "Ages_Data", "ages.
 
 ```{r}
 #| label: wd-2-ex-1
-
+# Lab 3 Question 7
+instructors <- teacher_evals_clean |> 
+  select(teacher_id, academic_degree, seniority, sex) |> 
+  distinct(teacher_id, .keep_all = TRUE)
 ```
 
 -   Example removing specified columns
 
 ```{r}
 #| label: wd-2-ex-2
-
+# Lab 5 - The Witnesses (Revised for Portfolio)
+person |> 
+  filter(address_street_name == "Northwestern Dr") |>  # Find first witness
+  slice_max(address_number) |> 
+  left_join(y = interview,                             # Search for interview by person_id
+            by = join_by(id == person_id)) |>          
+  select(-(id:ssn))  |>                               # View interview transcript
+  kable(col.names = "Clue #2")
 ```
 
 -   Example selecting columns based on logical values (e.g., `starts_with()`, `ends_with()`, `contains()`, `where()`)
 
 ```{r}
 #| label: wd-2-ex-3
-
+# ????????
 ```
 
 **WD-3: I can filter rows from a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -72,21 +82,47 @@ agesxl <- read_xlsx(path = here::here("Week 2", "Check-ins", "Ages_Data", "ages.
 
 ```{r}
 #| label: wd-3-numeric-ex-1
-
+# Lab 3 Question 11
+teacher_evals_clean |> 
+  group_by(teacher_id) |> 
+  filter(seniority == 1) |> 
+  summarize(avg_percent_failed = mean(percent_failed_cur)) |> 
+  filter(avg_percent_failed == max(avg_percent_failed) | 
+         avg_percent_failed == min(avg_percent_failed)) |>
+  arrange(avg_percent_failed) |> 
+  kable()
 ```
 
 -   Numeric Example 2
 
 ```{r}
 #| label: wd-3-numeric-ex-1
-
+# Lab 3 - Question 12
+teacher_evals_clean |> 
+  group_by(teacher_id, seniority, sex) |> 
+  filter(academic_degree %in% c("prof", "dr")) |> 
+  summarize(resp_rate = mean(resp_share),
+            .groups = "drop") |> 
+  filter(resp_rate == max(resp_rate) | 
+         resp_rate == min(resp_rate)) |>
+  arrange(resp_rate) |>
+  kable()
 ```
 
 -   Character Example 1 (any context)
 
 ```{r}
 #| label: wd-3-character
-
+# Lab 3 - Question 12
+teacher_evals_clean |> 
+  group_by(teacher_id, seniority, sex) |> 
+  filter(academic_degree %in% c("prof", "dr")) |> 
+  summarize(resp_rate = mean(resp_share),
+            .groups = "drop") |> 
+  filter(resp_rate == max(resp_rate) | 
+         resp_rate == min(resp_rate)) |>
+  arrange(resp_rate) |>
+  kable()
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
@@ -94,6 +130,31 @@ agesxl <- read_xlsx(path = here::here("Week 2", "Check-ins", "Ages_Data", "ages.
 ```{r}
 #| label: wd-3-string
 
+# Lab 5 - Inspecting the Crime Scene
+get_fit_now_member |>
+  filter(membership_status == "gold",                  # Find all gold members with a membership
+         str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
+  left_join(person,
+            join_by(person_id == id, name)) |>         # Use person data to find associated license
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
+  filter(str_detect(plate_number,
+                    pattern = "H42W")) |> 
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
+  filter(make_date(year  = str_sub(check_in_date,
+                                   start = 1,
+                                   end = 4),
+                   month = str_sub(check_in_date,
+                                   start = 5,
+                                   end = 6),
+                   day   = str_sub(check_in_date,
+                                   start = 7,
+                                   end = 8)) == "2018-01-09") |> 
+  left_join(interview,                                     
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
+  kable(col.names = "Clue #4")
 ```
 
 -   Date (example must use functions from **lubridate**)
@@ -101,6 +162,31 @@ agesxl <- read_xlsx(path = here::here("Week 2", "Check-ins", "Ages_Data", "ages.
 ```{r}
 #| label: wd-3-date
 
+# Lab 5 - Inspecting the Crime Scene
+get_fit_now_member |>
+  filter(membership_status == "gold",                  # Find all gold members with a membership
+         str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
+  left_join(person,
+            join_by(person_id == id, name)) |>         # Use person data to find associated license
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
+  filter(str_detect(plate_number,
+                    pattern = "H42W")) |> 
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
+  filter(make_date(year  = str_sub(check_in_date,
+                                   start = 1,
+                                   end = 4),
+                   month = str_sub(check_in_date,
+                                   start = 5,
+                                   end = 6),
+                   day   = str_sub(check_in_date,
+                                   start = 7,
+                                   end = 8)) == "2018-01-09") |> 
+  left_join(interview,                                     
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
+  kable(col.names = "Clue #4")
 ```
 
 **WD-4: I can modify existing variables and create new variables in a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
