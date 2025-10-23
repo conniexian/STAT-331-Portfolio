@@ -22,6 +22,7 @@ execute:
 
 ```{r}
 #| label: wd-1-csv-1
+
 # Lab 2 Question 1
 surveys <- read_csv(here::here("Week 2", "surveys.csv"))
 ```
@@ -30,6 +31,7 @@ surveys <- read_csv(here::here("Week 2", "surveys.csv"))
 
 ```{r}
 #| label: wd-1-csv-2
+
 # Lab 3 Question 2
 teacher_evals <- read_csv(here::here("Week 3", "teacher_evals.csv"))
 ```
@@ -38,6 +40,7 @@ teacher_evals <- read_csv(here::here("Week 3", "teacher_evals.csv"))
 
 ```{r}
 #| label: wd-1-xlsx
+
 # Check-In 2.2
 agesxl <- read_xlsx(path = here::here("Week 2", "Check-ins", "Ages_Data", "ages.xlsx"),
                     sheet = "ages")
@@ -49,6 +52,7 @@ agesxl <- read_xlsx(path = here::here("Week 2", "Check-ins", "Ages_Data", "ages.
 
 ```{r}
 #| label: wd-2-ex-1
+
 # Lab 3 Question 7
 instructors <- teacher_evals_clean |> 
   select(teacher_id, academic_degree, seniority, sex) |> 
@@ -59,6 +63,7 @@ instructors <- teacher_evals_clean |>
 
 ```{r}
 #| label: wd-2-ex-2
+
 # Lab 5 - The Witnesses (Revised for Portfolio)
 person |> 
   filter(address_street_name == "Northwestern Dr") |>  # Find first witness
@@ -82,6 +87,7 @@ person |>
 
 ```{r}
 #| label: wd-3-numeric-ex-1
+
 # Lab 3 Question 11
 teacher_evals_clean |> 
   group_by(teacher_id) |> 
@@ -97,6 +103,7 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: wd-3-numeric-ex-1
+
 # Lab 3 - Question 12
 teacher_evals_clean |> 
   group_by(teacher_id, seniority, sex) |> 
@@ -113,7 +120,12 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: wd-3-character
+
 # Lab 3 - Question 12
+
+# Feedback: I would recommend using the %in% operator instead of the or!
+# Revision Reflection: Initially, I used an | operator to filter the data. However, by using the %in% operator, I can increase the efficiency of my code. Using the %in% operator also makes my code more easily readable, since it is more clear how the data is being filtered now.
+
 teacher_evals_clean |> 
   group_by(teacher_id, seniority, sex) |> 
   filter(academic_degree %in% c("prof", "dr")) |> 
@@ -196,6 +208,18 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-4-numeric-ex-1
 
+# Challenge 3 Question 1
+teacher_evals_compare <- teacher_evals |> 
+  filter(question_no == 903) |> 
+  mutate(SET_level = if_else(SET_score_avg >= 4,
+                             "excellent",
+                             "standard"),
+         sen_level = case_when(seniority <= 4                 ~ "junior",
+                               seniority > 4 & seniority <= 8 ~ "senior",
+                               seniority > 8                  ~ "very senior")) |> 
+  select(course_id,
+         SET_level,
+         sen_level)
 ```
 
 -   Numeric Example 2
@@ -210,6 +234,51 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-4-factor-ex-1
 
+# Lab 4 Question 7
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         Infant = mc_infant,
+         Toddler = mc_toddler,
+         Preschool = mc_preschool) |> 
+  pivot_longer(cols = c(Infant, Toddler, Preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct(age_group,
+                         levels = c("Infant", "Toddler", "Preschool")),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region")
 ```
 
 -   Factor Example 2 (reordering levels)
@@ -217,6 +286,52 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-4-factor-ex-2
 
+
+# Lab 4 Question 7
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         Infant = mc_infant,
+         Toddler = mc_toddler,
+         Preschool = mc_preschool) |> 
+  pivot_longer(cols = c(Infant, Toddler, Preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct(age_group,
+                         levels = c("Infant", "Toddler", "Preschool")),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region")
 ```
 
 -   Character (example must use functions from **stringr**)
@@ -230,7 +345,40 @@ get_fit_now_member |>
 
 ```{r}
 #| label: wd-4-date
-
+# Lab 5 - The Employer
+drivers_license |> 
+  filter(height >= 65 & height <= 67,            # Use drivers license data to filter by
+         hair_color == "red",                    # described characteristics
+         car_make == "Tesla",
+         car_model == "Model S") |> 
+  left_join(person,                              # Find person ID for all suspects
+            join_by(id == license_id)) |> 
+  rename(license_id = id,                        # Rename IDs for clarity
+           person_id = id.y) |> 
+  left_join(facebook_event_checkin,              # Check facebook event list for attendees
+             join_by(person_id)) |> 
+  mutate(date = make_date(year  = str_sub(date,  # View attendance during Dec 2017
+                                   start = 1,
+                                   end = 4),
+                          month = str_sub(date,
+                                   start = 5,
+                                   end = 6),
+                          day   = str_sub(date,
+                                   start = 7,
+                                   end = 8))) |> 
+  filter(date %within% interval(mdy("December 1, 2017"),
+                                mdy("December 31, 2017"))) |> 
+  group_by(person_id, name, event_name, ssn) |>  # Find who has attended the concert 3 times
+  summarize(count = n(),
+            .groups = "drop") |>
+  filter(event_name == "SQL Symphony Concert",
+         count == 3) |>
+  left_join(income,                              # Confirm that suspect has a lot of money
+            join_by(ssn)) |>                     # Income = 330,000 !!!
+  left_join(interview,                           # Retrieve suspect interview
+            join_by(person_id)) |>
+  select(person_id, name, transcript)  |>        # View interview transcript
+  kable(col.names = c("Person ID", "Name", "Transcript"))  
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
@@ -635,6 +783,8 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dsm-2-1
 
+# Challenge 3 Question 3
+chisq.test(teacher_evals_compare$sen_level,teacher_evals_compare$SET_level)
 ```
 
 -   Example 2
@@ -642,6 +792,9 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dsm-2-2
 
+# Lab 4 Question 9
+reg_mod1 <- lm(mc_infant ~ mhi_2018, data = ca_childcare)
+summary(reg_mod1)
 ```
 
 -   Example 3
@@ -649,6 +802,10 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dsm-2-3
 
+# Lab 2 Question 17
+species_mod <- aov(weight ~ species, data = surveys)
+
+summary(species_mod)
 ```
 
 ## Revising My Thinking
