@@ -70,7 +70,7 @@ person |>
   slice_max(address_number) |> 
   left_join(y = interview,                             # Search for interview by person_id
             by = join_by(id == person_id)) |>          
-  select(-(id:ssn))  |>                               # View interview transcript
+  select(-(id:ssn))  |>                                # View interview transcript
   kable(col.names = "Clue #2")
 ```
 
@@ -78,7 +78,7 @@ person |>
 
 ```{r}
 #| label: wd-2-ex-3
-# ????????
+# need to modify (check slides for starts_with())
 ```
 
 **WD-3: I can filter rows from a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -88,21 +88,28 @@ person |>
 ```{r}
 #| label: wd-3-numeric-ex-1
 
-# Lab 3 Question 11
-teacher_evals_clean |> 
-  group_by(teacher_id) |> 
-  filter(seniority == 1) |> 
-  summarize(avg_percent_failed = mean(percent_failed_cur)) |> 
-  filter(avg_percent_failed == max(avg_percent_failed) | 
-         avg_percent_failed == min(avg_percent_failed)) |>
-  arrange(avg_percent_failed) |> 
-  kable()
+# Lab 3 Question 5
+teacher_evals_clean <- teacher_evals |>
+  rename(sex = gender) |>
+  filter(no_participants > 10) |>
+  mutate(across(.cols = c(teacher_id, question_no, academic_degree, sex),
+                .fns = ~ as.factor(.x))) |>
+  select(course_id,
+         teacher_id,
+         question_no,
+         no_participants,
+         resp_share,
+         SET_score_avg,
+         percent_failed_cur,
+         academic_degree,
+         seniority,
+         sex)
 ```
 
 -   Numeric Example 2
 
 ```{r}
-#| label: wd-3-numeric-ex-1
+#| label: wd-3-numeric-ex-2
 
 # Lab 3 - Question 12
 teacher_evals_clean |> 
@@ -124,7 +131,10 @@ teacher_evals_clean |>
 # Lab 3 - Question 12
 
 # Feedback: I would recommend using the %in% operator instead of the or!
-# Revision Reflection: Initially, I used an | operator to filter the data. However, by using the %in% operator, I can increase the efficiency of my code. Using the %in% operator also makes my code more easily readable, since it is more clear how the data is being filtered now.
+# Revision Reflection: Initially, I used an | operator to filter the data.
+# However, by using the %in% operator, I can increase the efficiency of my 
+# code. Using the %in% operator also makes my code more easily readable, 
+# since it is more clear how the data is being filtered now.
 
 teacher_evals_clean |> 
   group_by(teacher_id, seniority, sex) |> 
@@ -234,51 +244,7 @@ teacher_evals_compare <- teacher_evals |>
 ```{r}
 #| label: wd-4-factor-ex-1
 
-# Lab 4 Question 7
-ca_childcare |> 
-  select(census_region,
-         county_name,
-         study_year,
-         Infant = mc_infant,
-         Toddler = mc_toddler,
-         Preschool = mc_preschool) |> 
-  pivot_longer(cols = c(Infant, Toddler, Preschool),
-               names_to = "age_group",
-               values_to = "median_price") |>
-  mutate(age_group = fct(age_group,
-                         levels = c("Infant", "Toddler", "Preschool")),
-         census_region = fct_reorder2(.f = census_region,
-                                     .x = study_year,
-                                     .y = median_price,
-                                     .desc = TRUE)) |> 
-  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
-  geom_point(size = 0.5) +
-  geom_smooth(linewidth = 0.5) +
-  facet_wrap(vars(age_group)) +
-  theme_bw() +
-  theme(aspect.ratio = 1,
-        axis.text.x = element_text(size = 6),
-        axis.text.y = element_text(size = 6),
-        title = element_text(size = 8),
-        legend.title = element_text(size = 10),
-        legend.key.size = unit(0.4, "cm")) +
-  scale_x_continuous(n.breaks = 7) +
-  scale_y_continuous(limits = c(100,500)) +
-  scale_color_manual(values = colors,
-                     labels = c("San Francisco Bay Area",
-                                "Orange County",
-                                "Los Angeles County",
-                                "North San Joaquin Valley",
-                                "Central Coast",
-                                "Inland Empire",
-                                "Superior California",
-                                "South San Joaquin Valley",
-                                "San Diego - Imperial",
-                                "North Coast")) +
-  labs(x = "Study Year",
-       y = NULL,
-       title = "Weekly Median Price for Center-Based Childcare ($)",
-       color = "Calfornia Region")
+# modify
 ```
 
 -   Factor Example 2 (reordering levels)
@@ -286,8 +252,10 @@ ca_childcare |>
 ```{r}
 #| label: wd-4-factor-ex-2
 
+# Lab 4 Revisions Question 7
 
-# Lab 4 Question 7
+colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10)    # color palette
+
 ca_childcare |> 
   select(census_region,
          county_name,
@@ -339,12 +307,14 @@ ca_childcare |>
 ```{r}
 #| label: wd-4-string
 
+### need to modify
 ```
 
 -   Date (example must use functions from **lubridate**)
 
 ```{r}
 #| label: wd-4-date
+
 # Lab 5 - The Employer
 drivers_license |> 
   filter(height >= 65 & height <= 67,            # Use drivers license data to filter by
@@ -394,7 +364,7 @@ drivers_license |>
 
 ```{r}
 #| label: wd-5-right
-
+# need to modify
 ```
 
 -   `left_join()` **or** `right_join()` Example 2
@@ -408,14 +378,14 @@ drivers_license |>
 
 ```{r}
 #| label: wd-5-inner-ex-1
-
+# need to modify
 ```
 
 -   `inner_join()` Example 2
 
 ```{r}
 #| label: wd-5-inner-ex-2
-
+# need to modify
 ```
 
 **WD-6: I can use filtering joins to filter rows from a dataframe.**
@@ -424,14 +394,14 @@ drivers_license |>
 
 ```{r}
 #| label: wd-6-semi
-
+# need to modify
 ```
 
 -   `anti_join()`
 
 ```{r}
 #| label: wd-6-anti
-
+# need to modify
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -577,6 +547,26 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-3-1-ex-1
 
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type), 
+              size = 0.75, 
+              alpha = 1,
+              position = position_jitterdodge()) + 
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Median Weekly Price of California Childcare in 2018",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c("#FFABC3","#BFC1FF"), labels = c("Center Based Care", "Family Childcare")) +
+  scale_x_continuous(labels = dollar) 
 ```
 
 -   I can use non-standard colors (Example 2)
@@ -584,6 +574,19 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-3-1-ex-2
 
+# Challenge 3 Question 2
+teacher_evals_compare |> 
+  ggplot() +
+  geom_bar(mapping = aes(x = sen_level, fill = SET_level), position = "fill" ) +
+  scale_fill_manual(values = c("excellent" = "#b796d4", "standard" = "#ba955c" )) +
+  labs(x = "Years of Experience",
+       y = NULL,
+       title = "Evaluation of Teachers' Use of Activities",
+       fill = "Evaluation Rating") +
+  theme_bw() +
+  theme(legend.position = "top",
+        panel.border = element_rect()) +
+  scale_y_continuous(labels = scales::percent) 
 ```
 
 -   I can use annotations (e.g., `geom_text()`)
@@ -607,6 +610,10 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-4-summarize
 
+# Lab 3 Question 5
+teacher_evals_clean |> 
+  summarize(unique_instructors = n_distinct(teacher_id),
+            unique_courses = n_distinct(course_id))
 ```
 
 -   Example using `across()`
@@ -623,6 +630,11 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-5-1
 
+# Lab 3 Question 9
+teacher_evals_clean |> 
+  group_by(course_id, teacher_id) |> 
+  summarize(num_question = n_distinct(question_no), .groups = "drop") |> 
+  filter(num_question == 9)
 ```
 
 -   Example 2
@@ -630,6 +642,13 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-5-2
 
+# Lab 4 Question 6
+ca_childcare |> 
+  filter(study_year == 2018) |> 
+  group_by(census_region, study_year) |> 
+  summarize(median_mc_infant = median(mc_infant),
+            .groups = "drop") |> 
+  slice_min(median_mc_infant)
 ```
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
@@ -662,6 +681,26 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-7-ex-1
 
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type),                     
+              size = 0.75,                                 
+              position = position_jitterdodge()) + 
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Median Weekly Price of California Childcare in 2018",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c("#FFABC3","#BFC1FF"), 
+                    labels = c("Center Based Care", "Family Childcare")) +
+  scale_x_continuous(labels = dollar) 
 ```
 
 -   I can modify the layout of my table to be more readable (e.g., `pivot_longer()` or `pivot_wider()`)
@@ -680,6 +719,22 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: pe-1-one-call
 
+# Lab 3 Question 10
+
+# Revision Reflection: Initially, I had two separate filter functions
+# for the question number and the instructors. I realize now that it 
+# would be more efficient to just use one filter function and input two
+# arguments to only call the function one time.
+
+teacher_evals_clean |> 
+  group_by(teacher_id) |> 
+  filter(n() >= 5,
+         question_no == 901) |> 
+  summarize(Q1_avg_rating = mean(SET_score_avg)) |> 
+  filter(Q1_avg_rating == max(Q1_avg_rating) | 
+         Q1_avg_rating == min(Q1_avg_rating)) |>
+  arrange(Q1_avg_rating) |> 
+  kable()
 ```
 
 -   using `across()`
@@ -687,6 +742,22 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: pe-1-across
 
+# Lab 3 Question 5
+teacher_evals_clean <- teacher_evals |>
+  rename(sex = gender) |>
+  filter(no_participants > 10) |>
+  mutate(across(.cols = c(teacher_id, question_no, academic_degree, sex),
+                .fns = ~ as.factor(.x))) |>
+  select(course_id,
+         teacher_id,
+         question_no,
+         no_participants,
+         resp_share,
+         SET_score_avg,
+         percent_failed_cur,
+         academic_degree,
+         seniority,
+         sex)
 ```
 
 -   using functions from the `map()` family
@@ -726,6 +797,22 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: pe-3-across
 
+# Lab 3 Question 5
+teacher_evals_clean <- teacher_evals |>
+  rename(sex = gender) |>
+  filter(no_participants > 10) |>
+  mutate(across(.cols = c(teacher_id, question_no, academic_degree, sex),
+                .fns = ~ as.factor(.x))) |>
+  select(course_id,
+         teacher_id,
+         question_no,
+         no_participants,
+         resp_share,
+         SET_score_avg,
+         percent_failed_cur,
+         academic_degree,
+         seniority,
+         sex)
 ```
 
 -   using a `map()` function with **one** input (e.g., `map()`, `map_chr()`, `map_dbl()`, etc.)
@@ -749,6 +836,61 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: pe-4-1
 
+# Lab 4 Revisions Question 7
+
+# Revision Reflection (section): ... Secondly, I revised the code that sets 
+# the width of the line in geom_smooth(). Initially, I used "size" as the argument
+# to set the width. However, I see now that there is a warning that states the
+# 'size' aesthetic for lines was deprecated in a previous version and I should 
+# have used 'linewidth' instead. Using a modern tool will help prevent issues 
+# with running my code in the future.
+
+colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10)   # color palette
+
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         Infant = mc_infant,
+         Toddler = mc_toddler,
+         Preschool = mc_preschool) |> 
+  pivot_longer(cols = c(Infant, Toddler, Preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct(age_group,
+                         levels = c("Infant", "Toddler", "Preschool")),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region") 
 ```
 
 -   I can connect a data wrangling pipeline into a `ggplot()`
@@ -756,6 +898,54 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: pe-4-2
 
+# Lab 4 Revisions Question 7
+
+colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10)  # color palette
+
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         Infant = mc_infant,
+         Toddler = mc_toddler,
+         Preschool = mc_preschool) |> 
+  pivot_longer(cols = c(Infant, Toddler, Preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct(age_group,
+                         levels = c("Infant", "Toddler", "Preschool")),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region") 
 ```
 
 ## Data Simulation & Statisical Models
@@ -792,9 +982,9 @@ chisq.test(teacher_evals_compare$sen_level,teacher_evals_compare$SET_level)
 ```{r}
 #| label: dsm-2-2
 
-# Lab 4 Question 9
-reg_mod1 <- lm(mc_infant ~ mhi_2018, data = ca_childcare)
-summary(reg_mod1)
+# Lab 4 Question 9 (Revised for Portfolio)
+lm(mc_infant ~ mhi_2018, data = ca_childcare) |> 
+  summary()
 ```
 
 -   Example 3
@@ -802,10 +992,9 @@ summary(reg_mod1)
 ```{r}
 #| label: dsm-2-3
 
-# Lab 2 Question 17
-species_mod <- aov(weight ~ species, data = surveys)
-
-summary(species_mod)
+# Lab 2 Question 17 (Revised for Portfolio)
+aov(weight ~ species, data = surveys) |> 
+  summary()
 ```
 
 ## Revising My Thinking
