@@ -152,7 +152,7 @@ teacher_evals_clean |>
 ```{r}
 #| label: wd-3-string
 
-# Lab 5 - Inspecting the Crime Scene
+# Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
 get_fit_now_member |>
   filter(membership_status == "gold",                  # Find all gold members with a membership
          str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
@@ -164,15 +164,7 @@ get_fit_now_member |>
                     pattern = "H42W")) |> 
   left_join(get_fit_now_check_in,                      # Check that date matches statement from  
             join_by(id == membership_id)) |>           # second witness
-  filter(make_date(year  = str_sub(check_in_date,
-                                   start = 1,
-                                   end = 4),
-                   month = str_sub(check_in_date,
-                                   start = 5,
-                                   end = 6),
-                   day   = str_sub(check_in_date,
-                                   start = 7,
-                                   end = 8)) == "2018-01-09") |> 
+  filter(ymd(check_in_date) == "2018-01-09") |> 
   left_join(interview,                                     
             join_by(person_id)) |>                     # Retrieve suspect interview
   select(transcript)   |>                              # View interview transcript
@@ -184,7 +176,7 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-3-date
 
-# Lab 5 - Inspecting the Crime Scene
+# Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
 get_fit_now_member |>
   filter(membership_status == "gold",                  # Find all gold members with a membership
          str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
@@ -196,15 +188,7 @@ get_fit_now_member |>
                     pattern = "H42W")) |> 
   left_join(get_fit_now_check_in,                      # Check that date matches statement from  
             join_by(id == membership_id)) |>           # second witness
-  filter(make_date(year  = str_sub(check_in_date,
-                                   start = 1,
-                                   end = 4),
-                   month = str_sub(check_in_date,
-                                   start = 5,
-                                   end = 6),
-                   day   = str_sub(check_in_date,
-                                   start = 7,
-                                   end = 8)) == "2018-01-09") |> 
+  filter(ymd(check_in_date) == "2018-01-09") |> 
   left_join(interview,                                     
             join_by(person_id)) |>                     # Retrieve suspect interview
   select(transcript)   |>                              # View interview transcript
@@ -307,7 +291,26 @@ ca_childcare |>
 ```{r}
 #| label: wd-4-string
 
-### need to modify
+# Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
+get_fit_now_member |>
+  mutate(id_starting_3 = str_sub(id,                   # Find all gold members with a membership
+                                 start = 1,            # number that start with 48Z
+                                 end = 3)) |> 
+  filter(membership_status == "gold",                  
+         id_starting_3 == "48Z") |>                    
+  left_join(person,                                    # Use person data to find associated license
+            join_by(person_id == id, name)) |>        
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
+  filter(str_detect(plate_number,
+                    pattern = "H42W")) |> 
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
+ ilter(ymd(check_in_date) == "2018-01-09") |> 
+  left_join(interview,                                     
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
+  kable(col.names = "Clue #4")
 ```
 
 -   Date (example must use functions from **lubridate**)
@@ -315,40 +318,24 @@ ca_childcare |>
 ```{r}
 #| label: wd-4-date
 
-# Lab 5 - The Employer
-drivers_license |> 
-  filter(height >= 65 & height <= 67,            # Use drivers license data to filter by
-         hair_color == "red",                    # described characteristics
-         car_make == "Tesla",
-         car_model == "Model S") |> 
-  left_join(person,                              # Find person ID for all suspects
-            join_by(id == license_id)) |> 
-  rename(license_id = id,                        # Rename IDs for clarity
-           person_id = id.y) |> 
-  left_join(facebook_event_checkin,              # Check facebook event list for attendees
-             join_by(person_id)) |> 
-  mutate(date = make_date(year  = str_sub(date,  # View attendance during Dec 2017
-                                   start = 1,
-                                   end = 4),
-                          month = str_sub(date,
-                                   start = 5,
-                                   end = 6),
-                          day   = str_sub(date,
-                                   start = 7,
-                                   end = 8))) |> 
-  filter(date %within% interval(mdy("December 1, 2017"),
-                                mdy("December 31, 2017"))) |> 
-  group_by(person_id, name, event_name, ssn) |>  # Find who has attended the concert 3 times
-  summarize(count = n(),
-            .groups = "drop") |>
-  filter(event_name == "SQL Symphony Concert",
-         count == 3) |>
-  left_join(income,                              # Confirm that suspect has a lot of money
-            join_by(ssn)) |>                     # Income = 330,000 !!!
-  left_join(interview,                           # Retrieve suspect interview
-            join_by(person_id)) |>
-  select(person_id, name, transcript)  |>        # View interview transcript
-  kable(col.names = c("Person ID", "Name", "Transcript"))  
+# Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
+get_fit_now_member |>
+  filter(membership_status == "gold",                  # Find all gold members with a membership
+         str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
+  left_join(person,
+            join_by(person_id == id, name)) |>         # Use person data to find associated license
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
+  filter(str_detect(plate_number,
+                    pattern = "H42W")) |> 
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
+  mutate(check_in_date = ymd(check_in_date)) |> 
+  filter(check_in_date == "2018-01-09") |> 
+  left_join(interview,                                     
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
+  kable(col.names = "Clue #4")
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
@@ -358,6 +345,23 @@ drivers_license |>
 ```{r}
 #| label: wd-5-left-ex-1
 
+# Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
+get_fit_now_member |>
+  filter(membership_status == "gold",                  # Find all gold members with a membership
+         str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
+  left_join(person,
+            join_by(person_id == id, name)) |>         # Use person data to find associated license
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
+  filter(str_detect(plate_number,
+                    pattern = "H42W")) |> 
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
+  filter(ymd(check_in_date) == "2018-01-09") |> 
+  left_join(interview,                                     
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
+  kable(col.names = "Clue #4")
 ```
 
 -   `right_join()` Example 1
@@ -372,6 +376,26 @@ drivers_license |>
 ```{r}
 #| label: wd-5-left-right-ex-2
 
+# Lab 5 - Investigating the Witnesses
+
+# Searching for Witness 1
+person |> 
+  filter(address_street_name == "Northwestern Dr") |>  # Find first witness
+  slice_max(address_number) |> 
+  left_join(y = interview,                             # Search for interview by person_id
+            by = join_by(id == person_id)) |>          
+  select(transcript)  |>                               # View interview transcript
+  kable(col.names = "Clue #2")
+
+# Searching for Witness 2
+person |> 
+  filter(address_street_name == "Franklin Ave",        # Find second witness
+         str_detect(name,
+                    pattern = "Annabel")) |> 
+  left_join(y = interview,                             # Search for interview by person_id
+            by = join_by(id == person_id)) |>          
+  select(transcript)  |>                               # View interview transcript
+  kable(col.names = "Clue #3")
 ```
 
 -   `inner_join()` Example 1
@@ -411,6 +435,53 @@ drivers_license |>
 ```{r}
 #| label: wd-7-long
 
+# Lab 4 Revision Question 7
+colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10) # color palette
+
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         Infant = mc_infant,
+         Toddler = mc_toddler,
+         Preschool = mc_preschool) |> 
+  pivot_longer(cols = c(Infant, Toddler, Preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct(age_group,
+                         levels = c("Infant", "Toddler", "Preschool")),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region") 
 ```
 
 -   `pivot_wider()`
@@ -418,6 +489,16 @@ drivers_license |>
 ```{r}
 #| label: wd-7-wide
 
+# Lab 4 Question 5
+ca_childcare |> 
+  filter(study_year %in% c("2008", "2018")) |> 
+  group_by(census_region, study_year)  |> 
+  summarize(median_household_inc = median(mhi_2018),
+            .groups = "drop") |> 
+  pivot_wider(names_from = study_year,
+              values_from = median_household_inc,
+              names_prefix = "median_income_") |> 
+  arrange(desc(median_income_2018))
 ```
 
 ## Reproducibility
@@ -426,11 +507,11 @@ drivers_license |>
 
 The following assignments satisfy the above criteria:
 
--   Example 1
--   Example 2
--   Example 3
--   Example 4
--   Example 5
+-   Lab 2
+-   Lab 3
+-   Challenge 3
+-   Challenge 4
+-   Lab 5
 
 **R-2: I can write well documented and tidy code.**
 
@@ -439,6 +520,29 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: r-2-1
 
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |>
+  mutate(care_type = fct(care_type)) |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type),
+              size = 0.75,
+              alpha = 1,
+              position = position_jitterdodge()) +
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Center-Based Childcare: Significantly More Expensive",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
+                    limits = c("family_childcare", "center_based_care"),
+                    labels = c("Family Childcare", "Center-Based Care")) +
+  scale_x_continuous(labels = dollar)
 ```
 
 -   Example of **dplyr** pipeline
@@ -446,6 +550,23 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: r-2-2
 
+# Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
+get_fit_now_member |>
+  filter(membership_status == "gold",                  # Find all gold members with a membership
+         str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
+  left_join(person,
+            join_by(person_id == id, name)) |>         # Use person data to find associated license
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
+  filter(str_detect(plate_number,
+                    pattern = "H42W")) |> 
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
+  filter(ymd(check_in_date) == "2018-01-09") |> 
+  left_join(interview,                                     
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
+  kable(col.names = "Clue #4")
 ```
 
 -   Example of function formatting
@@ -462,6 +583,15 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: r-3-example
 
+# Lab 3 - Question 12
+teacher_evals_clean |> 
+  group_by(teacher_id, seniority, sex) |> 
+  filter(academic_degree %in% c("prof", "dr")) |> 
+  summarize(resp_rate = mean(resp_share),
+            .groups = "drop") |> 
+  filter(resp_rate == max(resp_rate) | 
+         resp_rate == min(resp_rate)) |>
+  arrange(resp_rate) |>
 ```
 
 -   Example (function stops)
@@ -480,12 +610,41 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-1-num
 
+# Lab 4 Revisions Question 8
+ca_childcare |> 
+  ggplot(mapping = aes(x = mhi_2018, y = mc_infant)) +
+  geom_point(size = 0.75) +
+  geom_smooth(method = "lm") +
+  theme_bw() +
+  labs(x = "Median Household Income (in 2018 dollars)",
+       y = NULL,
+       title = "Median Weekly Price for Center-based Childcare for Infants in California") +
+  scale_x_continuous(labels = dollar) +
+  scale_y_continuous(labels = dollar)
 ```
 
 -   At least one numeric variable and one categorical variable
 
 ```{r}
 #| label: dvs-2-num-cat
+
+# Challenge 2 (Revised for Portfolio)
+ggplot(data = surveys,
+       mapping = aes(x = weight, y = species)) +
+   geom_jitter(color = "darkslateblue", alpha = 0.5, size = 0.5) +
+   geom_boxplot(outliers = FALSE, linewidth = 0.25, color = "gray10") +
+   labs(x = "Weight (g)",
+        y = "",
+        subtitle = "Rodent Species",
+        title = "Heaviest Portal, AZ Rodents: Abigula, Spectabilis, and Hispidus") +
+   theme_bw() +
+   theme(plot.title = element_text(face = "bold",                     # title formatting
+                                   size = 15, 
+                                   margin = margin(t = 10, b = 10)),
+         axis.ticks = element_line(linewidth = 0.1),                  # axis label formatting
+         axis.text = element_text(size = 7),
+         panel.grid.major.y = element_line(linewidth = 0.1),          # remove y gridlines and border 
+         panel.border = element_rect(linewidth = 0.25))
 
 ```
 
@@ -494,6 +653,29 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-cat
 
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |>
+  mutate(care_type = fct(care_type)) |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type),
+              size = 0.75,
+              alpha = 1,
+              position = position_jitterdodge()) +
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Center-Based Childcare: Significantly More Expensive",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
+                    limits = c("family_childcare", "center_based_care"),
+                    labels = c("Family Childcare", "Center-Based Care")) +
+  scale_x_continuous(labels = dollar)
 ```
 
 -   Dates (time series plot)
@@ -501,6 +683,53 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-date
 
+# Lab 4 Revisions Question 7
+colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10) # color palette
+
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         Infant = mc_infant,
+         Toddler = mc_toddler,
+         Preschool = mc_preschool) |> 
+  pivot_longer(cols = c(Infant, Toddler, Preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct(age_group,
+                         levels = c("Infant", "Toddler", "Preschool")),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region")
 ```
 
 **DVS-2: I use plot modifications to make my visualization clear to the reader.**
@@ -509,7 +738,29 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-2-ex-1
-
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |>
+  mutate(care_type = fct(care_type)) |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type),
+              size = 0.75,
+              alpha = 1,
+              position = position_jitterdodge()) +
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Center-Based Childcare: Significantly More Expensive",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
+                    limits = c("family_childcare", "center_based_care"),
+                    labels = c("Family Childcare", "Center-Based Care")) +
+  scale_x_continuous(labels = dollar)
 ```
 
 -   I can modify my colors to be accessible to anyone's eyes
@@ -517,13 +768,60 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-ex-2
 
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type),                     
+              size = 0.75,                                 
+              position = position_jitterdodge()) + 
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Median Weekly Price of California Childcare in 2018",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c("#FFABC3","#BFC1FF"), 
+                    labels = c("Center Based Care", "Family Childcare")) +
+  scale_x_continuous(labels = dollar) 
 ```
+
+![](images/clipboard-2794975299.png){width="282"}
+
+*Resource: Coloring for Colorblindness by David Nichols*
 
 -   I can modify my plot titles to clearly communicate the data context
 
 ```{r}
 #| label: dvs-2-ex-3
 
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |>
+  mutate(care_type = fct(care_type)) |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type),
+              size = 0.75,
+              alpha = 1,
+              position = position_jitterdodge()) +
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Center-Based Childcare: Significantly More Expensive",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
+                    limits = c("family_childcare", "center_based_care"),
+                    labels = c("Family Childcare", "Center-Based Care")) +
+  scale_x_continuous(labels = dollar)
 ```
 
 -   I can modify the text in my plot to be more readable
@@ -531,6 +829,23 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-ex-4
 
+# Challenge 2 (Revised for Portfolio)
+ggplot(data = surveys,
+       mapping = aes(x = weight, y = species)) +
+   geom_jitter(color = "darkslateblue", alpha = 0.5, size = 0.5) +
+   geom_boxplot(outliers = FALSE, linewidth = 0.25, color = "gray10") +
+   labs(x = "Weight (g)",
+        y = "",
+        subtitle = "Rodent Species",
+        title = "Heaviest Portal, AZ Rodents: Abigula, Spectabilis, and Hispidus") +
+   theme_bw() +
+   theme(plot.title = element_text(face = "bold",                     # title formatting
+                                   size = 15, 
+                                   margin = margin(t = 10, b = 10)),
+         axis.ticks = element_line(linewidth = 0.1),                  # axis label formatting
+         axis.text = element_text(size = 7),
+         panel.grid.major.y = element_line(linewidth = 0.1),          # remove y gridlines and border 
+         panel.border = element_rect(linewidth = 0.25))
 ```
 
 -   I can reorder my legend to align with the colors in my plot
@@ -538,6 +853,29 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-ex-5
 
+# Challenge 4 Analysis (Revised for Portfolio)
+childcare2018 |> 
+  pivot_longer(cols = c("center_based_care","family_childcare"),
+               names_to = "care_type",
+               values_to = "price")  |>
+  mutate(care_type = fct(care_type)) |> 
+  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(mapping = aes(color = care_type),
+              size = 0.75,
+              alpha = 1,
+              position = position_jitterdodge()) +
+  theme_bw() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Center-Based Childcare: Significantly More Expensive",
+       fill = "Type of Care") +
+  guides(color = "none") +
+  scale_color_manual(values = c("#96475D","#3C3E78")) +
+  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
+                    limits = c("family_childcare", "center_based_care"),
+                    labels = c("Family Childcare", "Center-Based Care")) +
+  scale_x_continuous(labels = dollar)
 ```
 
 **DVS-3: I show creativity in my visualizations**
@@ -547,26 +885,28 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-3-1-ex-1
 
-# Challenge 4 Analysis (Revised for Portfolio)
 childcare2018 |> 
   pivot_longer(cols = c("center_based_care","family_childcare"),
                names_to = "care_type",
-               values_to = "price")  |> 
+               values_to = "price")  |>
+  mutate(care_type = fct(care_type)) |> 
   ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
   geom_boxplot(outliers = FALSE) +
-  geom_jitter(mapping = aes(color = care_type), 
-              size = 0.75, 
+  geom_jitter(mapping = aes(color = care_type),
+              size = 0.75,
               alpha = 1,
-              position = position_jitterdodge()) + 
+              position = position_jitterdodge()) +
   theme_bw() +
   labs(x = NULL,
        y = NULL,
-       title = "Median Weekly Price of California Childcare in 2018",
+       title = "Center-Based Childcare: Significantly More Expensive",
        fill = "Type of Care") +
   guides(color = "none") +
   scale_color_manual(values = c("#96475D","#3C3E78")) +
-  scale_fill_manual(values = c("#FFABC3","#BFC1FF"), labels = c("Center Based Care", "Family Childcare")) +
-  scale_x_continuous(labels = dollar) 
+  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
+                    limits = c("family_childcare", "center_based_care"),
+                    labels = c("Family Childcare", "Center-Based Care")) +
+  scale_x_continuous(labels = dollar)
 ```
 
 -   I can use non-standard colors (Example 2)
@@ -574,19 +914,23 @@ childcare2018 |>
 ```{r}
 #| label: dvs-3-1-ex-2
 
-# Challenge 3 Question 2
-teacher_evals_compare |> 
-  ggplot() +
-  geom_bar(mapping = aes(x = sen_level, fill = SET_level), position = "fill" ) +
-  scale_fill_manual(values = c("excellent" = "#b796d4", "standard" = "#ba955c" )) +
-  labs(x = "Years of Experience",
-       y = NULL,
-       title = "Evaluation of Teachers' Use of Activities",
-       fill = "Evaluation Rating") +
-  theme_bw() +
-  theme(legend.position = "top",
-        panel.border = element_rect()) +
-  scale_y_continuous(labels = scales::percent) 
+# Challenge 2 (Revised for Portfolio)
+ggplot(data = surveys,
+       mapping = aes(x = weight, y = species)) +
+   geom_jitter(color = "darkslateblue", alpha = 0.5, size = 0.5) +
+   geom_boxplot(outliers = FALSE, linewidth = 0.25, color = "gray10") +
+   labs(x = "Weight (g)",
+        y = "",
+        subtitle = "Rodent Species",
+        title = "Heaviest Portal, AZ Rodents: Abigula, Spectabilis, and Hispidus") +
+   theme_bw() +
+   theme(plot.title = element_text(face = "bold",                     # title formatting
+                                   size = 15, 
+                                   margin = margin(t = 10, b = 10)),
+         axis.ticks = element_line(linewidth = 0.1),                  # axis label formatting
+         axis.text = element_text(size = 7),
+         panel.grid.major.y = element_line(linewidth = 0.1),          # remove y gridlines and border 
+         panel.border = element_rect(linewidth = 0.25))
 ```
 
 -   I can use annotations (e.g., `geom_text()`)
@@ -633,7 +977,8 @@ teacher_evals_clean |>
 # Lab 3 Question 9
 teacher_evals_clean |> 
   group_by(course_id, teacher_id) |> 
-  summarize(num_question = n_distinct(question_no), .groups = "drop") |> 
+  summarize(num_question = n_distinct(question_no),
+            .groups = "drop") |> 
   filter(num_question == 9)
 ```
 
@@ -658,6 +1003,15 @@ ca_childcare |>
 ```{r}
 #| label: dvs-6-ex-1
 
+# Challenge 4 Analysis
+childcare2018 |>   
+  group_by(county_name) |> 
+  summarize(median_cbc = median(center_based_care),
+            median_fcc = median(family_childcare)) |> 
+  mutate(Higher = ifelse(median_fcc > median_cbc, "Yes", " ")) |> 
+  arrange(desc(Higher), desc(median_fcc)) |> 
+  kable(col.names = c("County", "Center-based Care", "Family Childcare", "Higher?"),
+        caption = "Median Weekly Price of Childcare in 2018 by California County ($)")
 ```
 
 -   I can modify the text in my table to be more readable (e.g., bold face for column headers)
@@ -665,6 +1019,15 @@ ca_childcare |>
 ```{r}
 #| label: dvs-6-ex-2
 
+# Challenge 4 Analysis
+childcare2018 |>   
+  group_by(county_name) |> 
+  summarize(median_cbc = median(center_based_care),
+            median_fcc = median(family_childcare)) |> 
+  mutate(Higher = ifelse(median_fcc > median_cbc, "Yes", " ")) |> 
+  arrange(desc(Higher), desc(median_fcc)) |> 
+  kable(col.names = c("County", "Center-based Care", "Family Childcare", "Higher?"),
+        caption = "Median Weekly Price of Childcare in 2018 by California County ($)")
 ```
 
 -   I can arrange my table to have an intuitive ordering
@@ -672,6 +1035,15 @@ ca_childcare |>
 ```{r}
 #| label: dvs-6-ex-3
 
+# Challenge 4 Analysis
+childcare2018 |>   
+  group_by(county_name) |> 
+  summarize(median_cbc = median(center_based_care),
+            median_fcc = median(family_childcare)) |> 
+  mutate(Higher = ifelse(median_fcc > median_cbc, "Yes", " ")) |> 
+  arrange(desc(Higher), desc(median_fcc)) |> 
+  kable(col.names = c("County", "Center-based Care", "Family Childcare", "Higher?"),
+        caption = "Median Weekly Price of Childcare in 2018 by California County ($)")
 ```
 
 **DVS-7: I show creativity in my tables.**
@@ -685,22 +1057,25 @@ ca_childcare |>
 childcare2018 |> 
   pivot_longer(cols = c("center_based_care","family_childcare"),
                names_to = "care_type",
-               values_to = "price")  |> 
+               values_to = "price")  |>
+  mutate(care_type = fct(care_type)) |> 
   ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
   geom_boxplot(outliers = FALSE) +
-  geom_jitter(mapping = aes(color = care_type),                     
-              size = 0.75,                                 
-              position = position_jitterdodge()) + 
+  geom_jitter(mapping = aes(color = care_type),
+              size = 0.75,
+              alpha = 1,
+              position = position_jitterdodge()) +
   theme_bw() +
   labs(x = NULL,
        y = NULL,
-       title = "Median Weekly Price of California Childcare in 2018",
+       title = "Center-Based Childcare: Significantly More Expensive",
        fill = "Type of Care") +
   guides(color = "none") +
   scale_color_manual(values = c("#96475D","#3C3E78")) +
-  scale_fill_manual(values = c("#FFABC3","#BFC1FF"), 
-                    labels = c("Center Based Care", "Family Childcare")) +
-  scale_x_continuous(labels = dollar) 
+  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
+                    limits = c("family_childcare", "center_based_care"),
+                    labels = c("Family Childcare", "Center-Based Care")) +
+  scale_x_continuous(labels = dollar)
 ```
 
 -   I can modify the layout of my table to be more readable (e.g., `pivot_longer()` or `pivot_wider()`)
@@ -790,7 +1165,7 @@ teacher_evals_clean <- teacher_evals |>
 
 ```
 
-**PE-3:I can use iteration to reduce repetition in my code.**
+**PE-3: I can use iteration to reduce repetition in my code.**
 
 -   using `across()`
 
