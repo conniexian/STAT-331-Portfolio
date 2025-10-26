@@ -65,6 +65,7 @@ instructors <- teacher_evals_clean |>
 #| label: wd-2-ex-2
 
 # Lab 5 - The Witnesses (Revised for Portfolio)
+# Searching for Witness 1
 person |> 
   filter(address_street_name == "Northwestern Dr") |>  # Find first witness
   slice_max(address_number) |> 
@@ -72,6 +73,15 @@ person |>
             by = join_by(id == person_id)) |>          
   select(-(id:ssn))  |>                                # View interview transcript
   kable(col.names = "Clue #2")
+# Searching for Witness 2
+person |> 
+  filter(address_street_name == "Franklin Ave",        # Find second witness
+         str_detect(name,
+                    pattern = "Annabel")) |> 
+  left_join(y = interview,                             # Search for interview by person_id
+            by = join_by(id == person_id)) |>          
+  select(transcript)  |>                               # View interview transcript
+  kable(col.names = "Clue #3")
 ```
 
 -   Example selecting columns based on logical values (e.g., `starts_with()`, `ends_with()`, `contains()`, `where()`)
@@ -558,6 +568,26 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-6-semi
 
+# Lab 5 - The Witnesses (Revised for Portfolio)
+# Searching for Witness 1
+witness1_address <- tibble(street = "Northwestern Dr")
+person |> 
+  semi_join(witness1_address,                          # Find first witness
+            by = join_by(address_street_name == street)) |>  
+  slice_max(address_number) |> 
+  left_join(y = interview,                             # Search for interview by person_id
+            by = join_by(id == person_id)) |>          
+  select(transcript)  |>                               # View interview transcript
+  kable(col.names = "Clue #2")
+# Searching for Witness 2
+person |> 
+  filter(address_street_name == "Franklin Ave",        # Find second witness
+         str_detect(name,
+                    pattern = "Annabel")) |> 
+  left_join(y = interview,                             # Search for interview by person_id
+            by = join_by(id == person_id)) |>          
+  select(transcript)  |>                               # View interview transcript
+  kable(col.names = "Clue #3")
 ```
 
 -   `anti_join()`
@@ -1567,4 +1597,12 @@ I would also like to see more consistency in put spaces after commas in a list, 
 
 I believe that this review has good components of a constructive peer review. I highlight areas in which he demonstrates good practice and point out areas of improvement. I also explain how these changes can improve the readability of their code.
 
-Through our weekly peer programming activities, I have
+Through our weekly peer programming activities, I have learned how to verbally share my thought process and also give others space to share theirs. For example, when acting as Computer, I refuse to talk while it seems like the Coder is thinking. Only after they express an idea, I start to ask questions about their ideas. In doing so, I had the opportunity to hear about my classmates' thought processes and different ways we can approach a problem.
+
+On Discord, I have been able to share a few questions publicly that I hope my peers have been able to benefit from seeing. As I have had some of my own problems solved by others sharing their questions, I was happy to use the Discord to share the questions I had.
+
+![](images/clipboard-3260774400.png){width="471" height="50"}
+
+![](images/clipboard-53865351.png){width="470" height="51"}
+
+![](images/clipboard-2645290418.png){width="470"}
