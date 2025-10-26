@@ -10,7 +10,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_\_.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an A.
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -1550,16 +1550,21 @@ aov(weight ~ species, data = surveys) |>
 
 ## Revising My Thinking
 
-<!-- How did you revise your thinking throughout the course? How did you revise your thinking on the code examples you have provided in your portfolio? -->
-
-<!-- For the revisions included in your Portfolio, to help me understand the nature of your revisions, please denote somehow the feedback I provided you (e.g., boldface, italics, colored text) before your revisions. -->
+Throughout the course, I revised my thinking mostly through reducing inefficiencies in my code and improving readability in my work. After receiving feedback in Lab 3 about calling functions only once, I used a single filter statement with multiple arguments in multiple areas in Lab 5. Additionally, in Lab 3, I was also challenged to get find the minimum and maximum values of a variable in a table in a single pipeline. By revising my thinking on the slice() functions, I learned when the slice_max() and slice_min() variables might not be the best tools for certain situations. By exploring other options, I was able to reduce the number of objects in my code and completed Lab 5 without using any unnecessary objects.
 
 ## Extending My Thinking
 
-<!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
+The best example of how I have extended my thinking throughout this course is the use of the kable() to display information. After learning about the function to display long tables in Lab 3, I have been expanding on how I use this function to add creativity to my tables. By changing column names and adding table titles in Challenge 4 and using kable() to display clues throughout Lab 5, I believe that I have shown to apply previous course content to future assignments in way that gives my analyses a professional and creative touch.
 
 ## Peer Support & Collaboration
 
-<!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
+A peer review that I am particularly proud of was for Lab 3. I wrote:
 
-<!-- Include a description of how you grew as a collaborator through the weekly pair programming activities.   -->
+"Hello ———!
+For your feedback, I'd like to highlight how you added newlines in code lines with too many characters to prevent them from becoming too long as I thought this was good practice. I believe you could consider adding new line after every comma for very long lists, so that the lines can be read as a vertical list.\
+In your functions, I saw that you used named arguments most of the time, but saw that some were missing in your if_any() function. \
+I would also like to see more consistency in put spaces after commas in a list, but the code overall is fairly tidy. Nice work!"
+
+I believe that this review has good components of a constructive peer review. I highlight areas in which he demonstrates good practice and point out areas of improvement. I also explain how these changes can improve the readability of their code.
+
+Through our weekly peer programming activities, I have
