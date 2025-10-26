@@ -78,7 +78,59 @@ person |>
 
 ```{r}
 #| label: wd-2-ex-3
-# need to modify (check slides for starts_with())
+
+# Lab 4 Revisions Question 7 (Revised for Portfolio)
+
+colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10) # color palette
+
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         starts_with("mc_")) |> 
+  pivot_longer(cols = c(mc_infant, mc_toddler, mc_preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct_recode(age_group,
+                              "Infant" = "mc_infant",
+                              "Toddler" = "mc_toddler",
+                              "Preschool" = "mc_preschool"),
+         age_group = fct_relevel(age_group, 
+                                "Infant",
+                                "Toddler",
+                                "Preschool"),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region") 
 ```
 
 **WD-3: I can filter rows from a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -221,6 +273,22 @@ teacher_evals_compare <- teacher_evals |>
 ```{r}
 #| label: wd-4-numeric-ex-2
 
+# Lab 3 Question 5
+teacher_evals_clean <- teacher_evals |>
+  rename(sex = gender) |>
+  filter(no_participants > 10) |>
+  mutate(across(.cols = c(teacher_id, question_no, academic_degree, sex),
+                .fns = ~ as.factor(.x))) |>
+  select(course_id,
+         teacher_id,
+         question_no,
+         no_participants,
+         resp_share,
+         SET_score_avg,
+         percent_failed_cur,
+         academic_degree,
+         seniority,
+         sex)
 ```
 
 -   Factor Example 1 (renaming levels)
@@ -228,7 +296,58 @@ teacher_evals_compare <- teacher_evals |>
 ```{r}
 #| label: wd-4-factor-ex-1
 
-# modify
+# Lab 4 Revisions Question 7 (Revised for Portfolio)
+
+colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10) # color palette
+
+ca_childcare |> 
+  select(census_region,
+         county_name,
+         study_year,
+         starts_with("mc_")) |> 
+  pivot_longer(cols = c(mc_infant, mc_toddler, mc_preschool),
+               names_to = "age_group",
+               values_to = "median_price") |>
+  mutate(age_group = fct_recode(age_group,
+                              "Infant" = "mc_infant",
+                              "Toddler" = "mc_toddler",
+                              "Preschool" = "mc_preschool"),
+         age_group = fct_relevel(age_group, 
+                                "Infant",
+                                "Toddler",
+                                "Preschool"),
+         census_region = fct_reorder2(.f = census_region,
+                                     .x = study_year,
+                                     .y = median_price,
+                                     .desc = TRUE)) |> 
+  ggplot(mapping = aes(x = study_year, y = median_price, color = census_region)) +
+  geom_point(size = 0.5) +
+  geom_smooth(linewidth = 0.5) +
+  facet_wrap(vars(age_group)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        title = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        legend.key.size = unit(0.4, "cm")) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(limits = c(100,500)) +
+  scale_color_manual(values = colors,
+                     labels = c("San Francisco Bay Area",
+                                "Orange County",
+                                "Los Angeles County",
+                                "North San Joaquin Valley",
+                                "Central Coast",
+                                "Inland Empire",
+                                "Superior California",
+                                "South San Joaquin Valley",
+                                "San Diego - Imperial",
+                                "North Coast")) +
+  labs(x = "Study Year",
+       y = NULL,
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color = "Calfornia Region") 
 ```
 
 -   Factor Example 2 (reordering levels)
@@ -237,6 +356,9 @@ teacher_evals_compare <- teacher_evals |>
 #| label: wd-4-factor-ex-2
 
 # Lab 4 Revisions Question 7
+
+# Feedback: The fct_reorder2() function is what you want to reorder the legend!
+# Revision Reflection (section): By using the fct_reorder2(), I can reorder the facets based off of TWO variables in the same way that the scatter plot uses both the x and y variables to plot points. Using this function over fct_reorder() is a better representation of the data being presented in the graph. ...
 
 colors <- colorRampPalette(RColorBrewer::brewer.pal(7, "Accent"))(10)    # color palette
 
@@ -368,7 +490,7 @@ get_fit_now_member |>
 
 ```{r}
 #| label: wd-5-right
-# need to modify
+
 ```
 
 -   `left_join()` **or** `right_join()` Example 2
@@ -402,14 +524,31 @@ person |>
 
 ```{r}
 #| label: wd-5-inner-ex-1
-# need to modify
+
+# Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
+get_fit_now_member |>
+  filter(membership_status == "gold",                  # Find all gold members with a membership
+         str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
+  left_join(person,
+            join_by(person_id == id, name)) |>         # Use person data to find associated license
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
+  filter(str_detect(plate_number,
+                    pattern = "H42W")) |> 
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
+  filter(ymd(check_in_date) == "2018-01-09") |> 
+  inner_join(interview,                                     
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
+  kable(col.names = "Clue #4")
 ```
 
 -   `inner_join()` Example 2
 
 ```{r}
 #| label: wd-5-inner-ex-2
-# need to modify
+
 ```
 
 **WD-6: I can use filtering joins to filter rows from a dataframe.**
@@ -418,14 +557,14 @@ person |>
 
 ```{r}
 #| label: wd-6-semi
-# need to modify
+
 ```
 
 -   `anti_join()`
 
 ```{r}
 #| label: wd-6-anti
-# need to modify
+
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -583,6 +722,16 @@ get_fit_now_member |>
 ```{r}
 #| label: r-3-example
 
+# Feedback: Is there a way you can get the max *and* min in **one** pipeline?
+# Revision Reflection (for Q10, Q11, & Q12): I thought that the 
+# best way to get the max and min values were to use the slice_min
+# and slice_max functions. However, you cannot use both in one 
+# pipeline. I learned that the min() and max() functions can be 
+# used inside the filter function to output all of the observations
+# equal to highest and lowest values in one pipeline. Doing so 
+# allows me to print the ties and also reduce the number of objects
+# in my code.
+
 # Lab 3 - Question 12
 teacher_evals_clean |> 
   group_by(teacher_id, seniority, sex) |> 
@@ -592,6 +741,7 @@ teacher_evals_clean |>
   filter(resp_rate == max(resp_rate) | 
          resp_rate == min(resp_rate)) |>
   arrange(resp_rate) |>
+  kable()
 ```
 
 -   Example (function stops)
@@ -965,6 +1115,11 @@ teacher_evals_clean |>
 ```{r}
 #| label: dvs-4-across
 
+# Lab 3 Question 6 (Revised for Portfolio)
+teacher_evals_clean |> 
+  summarize(across(.cols = c("teacher_id", "course_id"),
+                   .fns = ~ n_distinct(.x))) |> 
+  kable(col.names = c("Unique Instructors", "Unique Courses"))
 ```
 
 **DVS-5: I can find summaries of variables across multiple groups.**
@@ -1083,6 +1238,17 @@ childcare2018 |>
 ```{r}
 #| label: dvs-7-ex-2
 
+# Lab 4 Revisions Question 5 (Revised for Portfolio)
+ca_childcare |> 
+  filter(study_year %in% c("2008", "2018")) |> 
+  group_by(census_region, study_year)  |> 
+  summarize(median_household_inc = median(mhi_2018),
+            .groups = "drop") |> 
+  pivot_wider(names_from = study_year,
+              values_from = median_household_inc,
+              names_prefix = "median_income_") |> 
+  arrange(desc(median_income_2018)) |> 
+  kable(col.names = c("Census Region", "Median Income in 2008", "Median Income in 2018"))
 ```
 
 ## Program Efficiency
@@ -1096,6 +1262,8 @@ childcare2018 |>
 
 # Lab 3 Question 10
 
+# Feedback: Do you want to filter your groups? You should only call 
+# the filter() function once!
 # Revision Reflection: Initially, I had two separate filter functions
 # for the question number and the instructors. I realize now that it 
 # would be more efficient to just use one filter function and input two
@@ -1118,6 +1286,14 @@ teacher_evals_clean |>
 #| label: pe-1-across
 
 # Lab 3 Question 5
+
+# Revision Reflection: Initially, I had mutated each column individually
+# as I was unsure whether I wanted to mutate them all to the same 
+# function type. However, I should have realized, after I set them all
+# to factors, that I could have converted them all at once using an 
+# across() function. Doing so would be more efficient since the function
+# is not called multiple times.
+
 teacher_evals_clean <- teacher_evals |>
   rename(sex = gender) |>
   filter(no_participants > 10) |>
