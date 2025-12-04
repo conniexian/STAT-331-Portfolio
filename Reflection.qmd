@@ -501,6 +501,16 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-5-right
 
+# Lab 5 - Investigating the Witnesses (Revised for Portfolio)
+person |> 
+  right_join(y = interview,                             
+             by = join_by(id == person_id)) |>
+  filter(address_street_name == "Northwestern Dr" &
+           address_number == max(address_number) |
+         address_street_name == "Franklin Ave" &
+           str_detect(name, pattern = "Annabel"))  |> 
+  select(transcript)  |>                              
+  kable(col.names = "Clue #2 & Clue #3")
 ```
 
 -   `left_join()` **or** `right_join()` Example 2
@@ -509,7 +519,6 @@ get_fit_now_member |>
 #| label: wd-5-left-right-ex-2
 
 # Lab 5 - Investigating the Witnesses
-
 # Searching for Witness 1
 person |> 
   filter(address_street_name == "Northwestern Dr") |>  # Find first witness
@@ -539,13 +548,13 @@ person |>
 get_fit_now_member |>
   filter(membership_status == "gold",                  # Find all gold members with a membership
          str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
-  left_join(person,
+  inner_join(person,
             join_by(person_id == id, name)) |>         # Use person data to find associated license
-  left_join(drivers_license,                           # Use license data to find suspect with plate
+  inner_join(drivers_license,                           # Use license data to find suspect with plate
             join_by(license_id == id))  |>             # number that includes "H42"
   filter(str_detect(plate_number,
                     pattern = "H42W")) |> 
-  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+  inner_join(get_fit_now_check_in,                      # Check that date matches statement from  
             join_by(id == membership_id)) |>           # second witness
   filter(ymd(check_in_date) == "2018-01-09") |> 
   inner_join(interview,                                     
@@ -559,6 +568,16 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-5-inner-ex-2
 
+# Lab 5 - Investigating the Witnesses (Revised for Portfolio)
+person |> 
+  filter(address_street_name == "Northwestern Dr" &
+           address_number == max(address_number) |
+         address_street_name == "Franklin Ave" &
+           str_detect(name, pattern = "Annabel"))  |> 
+  inner_join(y = interview,                             
+             by = join_by(id == person_id)) |>          
+  select(transcript)  |>                              
+  kable(col.names = "Clue #2 & Clue #3")
 ```
 
 **WD-6: I can use filtering joins to filter rows from a dataframe.**
@@ -568,26 +587,20 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-6-semi
 
-# Lab 5 - The Witnesses (Revised for Portfolio)
-# Searching for Witness 1
-witness1_address <- tibble(street = "Northwestern Dr")
-person |> 
-  semi_join(witness1_address,                          # Find first witness
-            by = join_by(address_street_name == street)) |>  
-  slice_max(address_number) |> 
-  left_join(y = interview,                             # Search for interview by person_id
-            by = join_by(id == person_id)) |>          
-  select(transcript)  |>                               # View interview transcript
-  kable(col.names = "Clue #2")
-# Searching for Witness 2
-person |> 
-  filter(address_street_name == "Franklin Ave",        # Find second witness
-         str_detect(name,
-                    pattern = "Annabel")) |> 
-  left_join(y = interview,                             # Search for interview by person_id
-            by = join_by(id == person_id)) |>          
-  select(transcript)  |>                               # View interview transcript
-  kable(col.names = "Clue #3")
+# Lab 3 Question 12 (Revised for Portfolio)
+
+right_degrees <- tibble(academic_degree = c("prof","dr"))
+                        
+teacher_evals_clean |> 
+  group_by(teacher_id, seniority, sex) |> 
+  semi_join(right_degrees,
+            by = join_by(academic_degree)) |> 
+  summarize(resp_rate = mean(resp_share),
+            .groups = "drop") |> 
+  filter(resp_rate == max(resp_rate) | 
+         resp_rate == min(resp_rate)) |>
+  arrange(resp_rate) |>
+  kable()
 ```
 
 -   `anti_join()`
@@ -595,6 +608,20 @@ person |>
 ```{r}
 #| label: wd-6-anti
 
+# Lab 3 Question 12 (Revised for Portfolio)
+
+wrong_degrees <- tibble(academic_degree = c("ma","no_dgr"))
+                        
+teacher_evals_clean |> 
+  group_by(teacher_id, seniority, sex) |> 
+  anti_join(wrong_degrees,
+            by = join_by(academic_degree)) |> 
+  summarize(resp_rate = mean(resp_share),
+            .groups = "drop") |> 
+  filter(resp_rate == max(resp_rate) | 
+         resp_rate == min(resp_rate)) |>
+  arrange(resp_rate) |>
+  kable()
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -678,9 +705,9 @@ The following assignments satisfy the above criteria:
 
 -   Lab 2
 -   Lab 3
--   Challenge 3
--   Challenge 4
 -   Lab 5
+-   Lab 7
+-   Lab 9
 
 **R-2: I can write well documented and tidy code.**
 
@@ -721,32 +748,20 @@ childcare2018 |>
 
 # Lab 5 - Inspecting the Crime Scene (Revised for Portfolio)
 get_fit_now_member |>
-  
-  # Find all gold members with a membership number that start with 48Z
-  filter(membership_status == "gold",              
-         str_sub(id, start = 1, end = 3) == "48Z") |>
-  
-  # Use person data to find associated license
+  filter(membership_status == "gold",                  # Find all gold members with a membership
+         str_sub(id, start = 1, end = 3) == "48Z") |>  # number that start with 48Z
   left_join(person,
-            join_by(person_id == id, name)) |>         
-  
-  # Use license data to find suspect with plate number that includes "H42"
-  left_join(drivers_license,                           
-            join_by(license_id == id))  |>             
+            join_by(person_id == id, name)) |>         # Use person data to find associated license
+  left_join(drivers_license,                           # Use license data to find suspect with plate
+            join_by(license_id == id))  |>             # number that includes "H42"
   filter(str_detect(plate_number,
                     pattern = "H42W")) |> 
-  
-  # Check that date matches statement from second witness 
-  left_join(get_fit_now_check_in,                      
-            join_by(id == membership_id)) |>           
+  left_join(get_fit_now_check_in,                      # Check that date matches statement from  
+            join_by(id == membership_id)) |>           # second witness
   filter(ymd(check_in_date) == "2018-01-09") |> 
   left_join(interview,                                     
-            join_by(person_id)) |>  
-  
-  # Retrieve suspect interview
-  select(transcript)   |>
-  
-  # View interview transcript
+            join_by(person_id)) |>                     # Retrieve suspect interview
+  select(transcript)   |>                              # View interview transcript
   kable(col.names = "Clue #4")
 ```
 
@@ -768,6 +783,7 @@ impossible_to_NA <- function(x, min, max) {
    case_when(x < min ~ NA,
              x > max ~ NA,
              .default = x)
+   
 }
 ```
 
@@ -944,29 +960,40 @@ fish |>
 
 ```{r}
 #| label: dvs-2-ex-1
-# Challenge 4 Analysis (Revised for Portfolio)
-childcare2018 |> 
-  pivot_longer(cols = c("center_based_care","family_childcare"),
-               names_to = "care_type",
-               values_to = "price")  |>
-  mutate(care_type = fct(care_type)) |> 
-  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
-  geom_boxplot(outliers = FALSE) +
-  geom_jitter(mapping = aes(color = care_type),
-              size = 0.75,
-              alpha = 1,
-              position = position_jitterdodge()) +
-  theme_bw() +
-  labs(x = NULL,
+
+# Challenge 7 Question 5
+mycolors <- RColorBrewer::brewer.pal(8, "BrBG")[c(3,2,1,8)] # color palette
+  
+fish |> 
+  mutate(condition = condition_index(length, weight)) |> 
+  group_by(year, species) |> 
+  summarize(mean_condition = mean(condition, na.rm = TRUE),
+            .groups = "drop") |> 
+  mutate(species = fct_reorder2(.f = species,
+                               .x = year,
+                               .y = mean_condition)) |> 
+  ggplot(mapping = aes(x = year, y = mean_condition, color = species)) +
+  geom_rug(sides = "b", color = "gray85", lineend = "round", length = unit(100, "npc")) +
+  geom_smooth(se = FALSE) +
+  geom_point() +
+  theme_linedraw() +
+  scale_color_manual(values = mycolors,
+                     labels = c("Rainbow Trout",
+                                "Brown Trout",
+                                "Westslope Cutthroat Trout",
+                                "Bull Trout")) +
+  scale_x_continuous(breaks = seq(1988, 2007, by = 1)) +
+  theme(axis.text.x = element_text(size = 7),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.caption.position = "plot") +
+  labs(title = "Bull Trout in Worse Condition than Other Fish",
+       subtitle = "Mean Condition Index",
+       x = "Year",
        y = NULL,
-       title = "Center-Based Childcare: Significantly More Expensive",
-       fill = "Type of Care") +
-  guides(color = "none") +
-  scale_color_manual(values = c("#96475D","#3C3E78")) +
-  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
-                    limits = c("family_childcare", "center_based_care"),
-                    labels = c("Family Childcare", "Center-Based Care")) +
-  scale_x_continuous(labels = label_currency())
+       color = "Trout Species",
+       caption = "Black Foot River Fish in Helena, Montana")
 ```
 
 -   I can modify my colors to be accessible to anyone's eyes
@@ -994,6 +1021,8 @@ childcare2018 |>
   scale_fill_manual(values = c("#FFABC3","#BFC1FF"), 
                     labels = c("Center Based Care", "Family Childcare")) +
   scale_x_continuous(labels = label_currency()) 
+
+# color deficiency vision test shown in images
 ```
 
 ![](images/clipboard-2794975299.png){width="282"}
@@ -1059,29 +1088,39 @@ ggplot(data = surveys,
 ```{r}
 #| label: dvs-2-ex-5
 
-# Challenge 4 Analysis (Revised for Portfolio)
-childcare2018 |> 
-  pivot_longer(cols = c("center_based_care","family_childcare"),
-               names_to = "care_type",
-               values_to = "price")  |>
-  mutate(care_type = fct(care_type)) |> 
-  ggplot(mapping = aes(x = price, y = age_group, fill = care_type)) +
-  geom_boxplot(outliers = FALSE) +
-  geom_jitter(mapping = aes(color = care_type),
-              size = 0.75,
-              alpha = 1,
-              position = position_jitterdodge()) +
-  theme_bw() +
-  labs(x = NULL,
+# Challenge 7 Question 5
+mycolors <- RColorBrewer::brewer.pal(8, "BrBG")[c(3,2,1,8)] # color palette
+  
+fish |> 
+  mutate(condition = condition_index(length, weight)) |> 
+  group_by(year, species) |> 
+  summarize(mean_condition = mean(condition, na.rm = TRUE),
+            .groups = "drop") |> 
+  mutate(species = fct_reorder2(.f = species,
+                               .x = year,
+                               .y = mean_condition)) |> 
+  ggplot(mapping = aes(x = year, y = mean_condition, color = species)) +
+  geom_rug(sides = "b", color = "gray85", lineend = "round", length = unit(100, "npc")) +
+  geom_smooth(se = FALSE) +
+  geom_point() +
+  theme_linedraw() +
+  scale_color_manual(values = mycolors,
+                     labels = c("Rainbow Trout",
+                                "Brown Trout",
+                                "Westslope Cutthroat Trout",
+                                "Bull Trout")) +
+  scale_x_continuous(breaks = seq(1988, 2007, by = 1)) +
+  theme(axis.text.x = element_text(size = 7),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.caption.position = "plot") +
+  labs(title = "Bull Trout in Worse Condition than Other Fish",
+       subtitle = "Mean Condition Index",
+       x = "Year",
        y = NULL,
-       title = "Center-Based Childcare: Significantly More Expensive",
-       fill = "Type of Care") +
-  guides(color = "none") +
-  scale_color_manual(values = c("#96475D","#3C3E78")) +
-  scale_fill_manual(values = c(family_childcare = "#BFC1FF", center_based_care = "#FFABC3"), 
-                    limits = c("family_childcare", "center_based_care"),
-                    labels = c("Family Childcare", "Center-Based Care")) +
-  scale_x_continuous(labels = label_currency())
+       color = "Trout Species",
+       caption = "Black Foot River Fish in Helena, Montana")
 ```
 
 **DVS-3: I show creativity in my visualizations**
