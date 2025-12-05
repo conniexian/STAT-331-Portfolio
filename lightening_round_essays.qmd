@@ -8,7 +8,7 @@ editor: visual
 
 1.  Finish the sentence with another student’s name: "If \[Name of Student\] doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning.
 
-    ???????
+    If Abel Magallon doesn't earn an A, then no one should because Abel's ability to make clean, easy to understand plots in Lab 7 using tidy code exemplifies the skills we are expected to have at that level.
 
 2.  What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
 
